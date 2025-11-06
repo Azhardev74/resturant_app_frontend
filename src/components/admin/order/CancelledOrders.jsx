@@ -7,6 +7,7 @@ import EditOrderModal from "./EditOrderModal";
 import DeleteModal from "./DeleteModal";
 import ItemsModal from "./ItemsModal";
 import config from "../../../config";
+import Heading from "../ui/Heading";
 
 const CancelledOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -74,16 +75,16 @@ const CancelledOrders = () => {
   }, [token]);
 
   // 2. Add function to fetch restaurant details
- 
+
 
   const fetchRestaurantDetails = useCallback(async () => {
     if (!token) return;
     try {
       const res = await fetch(`${config.BASE_URL}/api/restaurant/admin`, {
         headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
       });
       if (!res.ok) throw new Error("Failed to fetch restaurant details");
       const data = await res.json();
@@ -148,7 +149,7 @@ const CancelledOrders = () => {
   const cancelledOrders = orders.filter((o) => o.status === "cancelled");
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-6 sm:px-6 lg:px-8 relative">
+    <div className="min-h-screen  px-4 py-6 sm:px-6 lg:px-8 relative">
       {/* ... (Notification Modal remains the same) ... */}
       <AnimatePresence>
         {notification.show && (
@@ -169,20 +170,18 @@ const CancelledOrders = () => {
                 stiffness: 300,
                 duration: 0.3,
               }}
-              className={`relative rounded-3xl shadow-2xl p-8 w-full max-w-sm mx-auto ${
-                notification.type === "success"
+              className={`relative rounded-3xl shadow-2xl p-8 w-full max-w-sm mx-auto ${notification.type === "success"
                   ? "bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200"
                   : "bg-gradient-to-br from-red-50 to-rose-50 border-2 border-red-200"
-              }`}
+                }`}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="text-center">
                 <div
-                  className={`w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-6 ${
-                    notification.type === "success"
+                  className={`w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-6 ${notification.type === "success"
                       ? "bg-green-100 text-green-600 border-2 border-green-200"
                       : "bg-red-100 text-red-600 border-2 border-red-200"
-                  }`}
+                    }`}
                 >
                   {notification.type === "success" ? (
                     <svg
@@ -217,20 +216,18 @@ const CancelledOrders = () => {
                 {/* FIX 1: Added `className` prop and some matching styles.
                  */}
                 <h3
-                  className={`text-2xl font-bold mb-4 ${
-                    notification.type === "success"
+                  className={`text-2xl font-bold mb-4 ${notification.type === "success"
                       ? "text-green-900"
                       : "text-red-900"
-                  }`}
+                    }`}
                 >
                   {notification.type === "success" ? "Success!" : "Oops!"}
                 </h3>
                 <p
-                  className={`text-xl mb-8 leading-relaxed ${
-                    notification.type === "success"
+                  className={`text-xl mb-8 leading-relaxed ${notification.type === "success"
                       ? "text-green-700"
                       : "text-red-700"
-                  }`}
+                    }`}
                 >
                   {notification.message}
                   {/* FIX 2: Removed extra 's' and '</div>' from here.
@@ -246,7 +243,7 @@ const CancelledOrders = () => {
                     notification.type === "success"
                       ? "bg-green-500 text-white hover:bg-green-600 shadow-green-200"
                       : "bg-red-500 text-white hover:bg-red-600 shadow-red-200"
-                  }`}
+                    }`}
                 >
                   Done
                 </motion.button>
@@ -256,11 +253,10 @@ const CancelledOrders = () => {
         )}
       </AnimatePresence>
 
-      <div className="max-w-7xl mx-auto">
-        <h2 className="text-3xl font-bold text-gray-900 mb-6 flex justify-center">
-          ❌ Cancelled Orders
-        </h2>
-
+      <div>
+        <div className="mb-4">
+          <Heading title={"Cancelled Orders"} />
+        </div>
         <OrdersTable
           orders={cancelledOrders}
           loading={loading}

@@ -119,7 +119,7 @@ export default function FoodListing({ menu, onQuantityChange }) {
                     {/* Bottom Info */}
                     <div className="flex justify-between items-end">
                       <span className="inline-flex items-center px-3 py-1 rounded-full bg-orange-50 text-orange-700 text-[13px] font-semibold border border-orange-200">
-                        ₹{item.price.toFixed(2)}
+                        ₹{item.price}
                       </span>
 
                       {!isUnavailable && (

@@ -6,6 +6,7 @@ import EditOrderModal from "./EditOrderModal";
 import DeleteModal from "./DeleteModal";
 import ItemsModal from "./ItemsModal";
 import config from "../../../config";
+import Heading from "../ui/Heading";
 
 const CompletedOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -88,9 +89,9 @@ const CompletedOrders = () => {
     try {
       const res = await fetch(`${config.BASE_URL}/api/restaurant/admin`, {
         headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
       });
       if (!res.ok) throw new Error("Failed to fetch restaurant details");
       const data = await res.json();
@@ -158,7 +159,7 @@ const CompletedOrders = () => {
   const completedOrders = orders.filter((o) => o.status === "completed");
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-6 sm:px-6 lg:px-8 relative">
+    <div className="min-h-screen  px-4 py-6 sm:px-6 lg:px-8 relative">
       {/* ... (Notification Modal remains the same) ... */}
       <AnimatePresence>
         {notification.show && (
@@ -181,21 +182,19 @@ const CompletedOrders = () => {
                 stiffness: 300,
                 duration: 0.3,
               }}
-              className={`relative rounded-3xl shadow-2xl p-8 w-full max-w-sm mx-auto ${
-                notification.type === "success"
-                  ? "bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200"
-                  : "bg-gradient-to-br from-red-50 to-rose-50 border-2 border-red-200"
-              }`}
+              className={`relative rounded-3xl shadow-2xl p-8 w-full max-w-sm mx-auto ${notification.type === "success"
+                ? "bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200"
+                : "bg-gradient-to-br from-red-50 to-rose-50 border-2 border-red-200"
+                }`}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="text-center">
                 {/* ... (icon, text, button) ... */}
                 <div
-                  className={`w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-6 ${
-                    notification.type === "success"
-                      ? "bg-green-100 text-green-600 border-2 border-green-200"
-                      : "bg-red-100 text-red-600 border-2 border-red-200"
-                  }`}
+                  className={`w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-6 ${notification.type === "success"
+                    ? "bg-green-100 text-green-600 border-2 border-green-200"
+                    : "bg-red-100 text-red-600 border-2 border-red-200"
+                    }`}
                 >
                   {notification.type === "success" ? (
                     <svg
@@ -228,20 +227,18 @@ const CompletedOrders = () => {
                   )}
                 </div>
                 <h3
-                  className={`text-3xl font-bold mb-4 ${
-                    notification.type === "success"
-                      ? "text-green-900"
-                      : "text-red-900"
-                  }`}
+                  className={`text-3xl font-bold mb-4 ${notification.type === "success"
+                    ? "text-green-900"
+                    : "text-red-900"
+                    }`}
                 >
                   {notification.type === "success" ? "Success!" : "Oops!"}
                 </h3>
                 <p
-                  className={`text-xl mb-8 leading-relaxed ${
-                    notification.type === "success"
-                      ? "text-green-700"
-                      : "text-red-700"
-                  }`}
+                  className={`text-xl mb-8 leading-relaxed ${notification.type === "success"
+                    ? "text-green-700"
+                    : "text-red-700"
+                    }`}
                 >
                   {notification.message}
                 </p>
@@ -249,11 +246,10 @@ const CompletedOrders = () => {
                   onClick={closeNotification}
                   whileTap={{ scale: 0.95 }}
                   whileHover={{ scale: 1.02 }}
-                  className={`w-full py-5 rounded-2xl text-xl font-bold shadow-lg transition-all ${
-                    notification.type === "success"
-                      ? "bg-green-500 text-white hover:bg-green-600 shadow-green-200"
-                      : "bg-red-500 text-white hover:bg-red-600 shadow-red-200"
-                  }`}
+                  className={`w-full py-5 rounded-2xl text-xl font-bold shadow-lg transition-all ${notification.type === "success"
+                    ? "bg-green-500 text-white hover:bg-green-600 shadow-green-200"
+                    : "bg-red-500 text-white hover:bg-red-600 shadow-red-200"
+                    }`}
                 >
                   Done
                 </motion.button>
@@ -263,10 +259,10 @@ const CompletedOrders = () => {
         )}
       </AnimatePresence>
 
-      <div className="max-w-7xl mx-auto">
-        <h2 className="text-3xl font-bold text-gray-900 mb-6 flex justify-center">
-          🏁 Completed Orders
-        </h2>
+      <div>
+        <div className="mb-4">
+          <Heading title={"Completed Orders"} />
+        </div>        
         <OrdersTable
           orders={completedOrders}
           loading={loading}

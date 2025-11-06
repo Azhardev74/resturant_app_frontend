@@ -414,7 +414,7 @@ export default function Header({
                                 </button>
 
                                 <span className="ml-2 text-gray-600">
-                                  × ₹{item.price.toFixed(2)}
+                                  × ₹{item.price}
                                 </span>
                               </div>
                             </div>
