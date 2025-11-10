@@ -6,7 +6,6 @@ const initialState = {
   menu: [],
   orders: [],
   loading: false,
-  items: {},
   error: null,
   cart: {
     items: {},
@@ -36,33 +35,28 @@ const clientSlice = createSlice({
     },
 
     // Cart reducers
-    // addToCart: (state, action) => {
-    //   const { id, item } = action.payload;
-
-    //   if (state.cart.items[id]) {
-    //     state.cart.items[id].quantity += 1;
-    //   } else {
-    //     state.cart.items[id] = {
-    //       ...item,
-    //       quantity: 1,
-    //     };
-    //   }
-
-    //   state.cart.totalItems = Object.values(state.cart.items).reduce(
-    //     (total, item) => total + item.quantity, 0
-    //   );
-    //   state.cart.totalAmount = Object.values(state.cart.items).reduce(
-    //     (total, item) => total + (item.price * item.quantity), 0
-    //   );
-    // },
-
     addToCart: (state, action) => {
-      const { id, item } = action.payload;
-      if (!state.items[id]) {
-        state.items[id] = { ...item, quantity: 1 };
+      const { id, item, price } = action.payload;
+      const resolvedPrice = price ?? item?.price ?? 0;
+
+      if (state.cart.items[id]) {
+        state.cart.items[id].quantity += 1;
       } else {
-        state.items[id].quantity += 1;
+        state.cart.items[id] = {
+          ...item,
+          price: resolvedPrice,
+          quantity: 1,
+        };
       }
+
+      state.cart.totalItems = Object.values(state.cart.items).reduce(
+        (total, cartItem) => total + cartItem.quantity,
+        0
+      );
+      state.cart.totalAmount = Object.values(state.cart.items).reduce(
+        (total, cartItem) => total + cartItem.price * cartItem.quantity,
+        0
+      );
     },
 
     removeFromCart: (state, action) => {
