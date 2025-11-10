@@ -10,7 +10,7 @@ import Admin from "./pages/Admin";
 import AdminLayout from "./layouts/AdminLayout";
 import Menu from "./components/admin/Menu/Menu.jsx";
 import { Provider } from "react-redux";
-import { store } from "./store";
+import { store } from "./redux/store";
 import OrdersList from "./components/admin/order/OrdersList.jsx";
 import Filter from "./components/Client/Filter";
 import LoginPage from "./components/admin/LoginPage";

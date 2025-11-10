@@ -1,6 +1,9 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import config from '../../config';
 
+
+//Admin Api is Slice 
+// reducerPath is Called name in Redux in store where RTK Stores its state
 export const adminApi = createApi({
   reducerPath: 'adminApi',
   baseQuery: fetchBaseQuery({
@@ -15,7 +18,7 @@ export const adminApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Admin', 'Restaurant', 'Order', 'Analytics', 'Menu'],
+  tagTypes: ['Admin', 'Restaurant', 'Order', 'Analytics', 'Menu', 'Profile'],
 
   endpoints: (builder) => ({
     // ✅ AUTH
@@ -78,6 +81,7 @@ export const adminApi = createApi({
     // ✅ MENU MANAGEMENT
     getMenu: builder.query({
       query: () => '/menu',
+      transformResponse: (response) => Array.isArray(response) ? response : (response?.menu ?? []),
       providesTags: ['Menu'],
     }),
 
@@ -106,6 +110,12 @@ export const adminApi = createApi({
       }),
       invalidatesTags: ['Menu'],
     }),
+
+    // PROFILE 
+    getProfile: builder.query({
+      query: () => '/profile',
+      providesTags: ['Profile']
+    })
   }),
 });
 

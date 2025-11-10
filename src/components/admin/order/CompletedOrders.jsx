@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import OrdersTable from "./OrdersTable";
@@ -21,16 +21,18 @@ const CompletedOrders = () => {
     message: "",
     type: "",
   });
-
-
-  // ✅ 1. Add state for restaurant details
   const [restaurantDetails, setRestaurantDetails] = useState(null);
+
+  // ✅ 1. Add state for filters
+  const [dateFilter, setDateFilter] = useState("today"); // Default to 'today'
+  // const [nameFilter, setNameFilter] = useState("");
 
   const token = localStorage.getItem("token") || "";
   const API_URL = `${config.BASE_URL}/api/order`;
   const tableType = "complete";
 
   const showNotification = (message, type = "success") => {
+    // ... (your existing showNotification function)
     setNotification({ show: true, message, type });
     setTimeout(
       () => setNotification({ show: false, message: "", type: "" }),
@@ -41,8 +43,8 @@ const CompletedOrders = () => {
   const closeNotification = () =>
     setNotification({ show: false, message: "", type: "" });
 
-  // ✅ Wrapped in useCallback for useEffect
   const fetchOrders = useCallback(async () => {
+    // ... (your existing fetchOrders function)
     if (!token)
       return showNotification("No token found. Please login first", "error");
 
@@ -62,10 +64,10 @@ const CompletedOrders = () => {
     } finally {
       setLoading(false);
     }
-  }, [token, API_URL]); // Added dependencies
+  }, [token, API_URL]);
 
   const fetchMenuItems = useCallback(async () => {
-    // ... (your existing fetchMenuItems code is fine) ...
+    // ... (your existing fetchMenuItems function)
     if (!token) return;
     try {
       const res = await fetch(`${config.BASE_URL}/api/menu`, {
@@ -83,8 +85,8 @@ const CompletedOrders = () => {
     }
   }, [token]);
 
-  // ✅ 2. Add function to fetch restaurant details
   const fetchRestaurantDetails = useCallback(async () => {
+    // ... (your existing fetchRestaurantDetails function)
     if (!token) return;
     try {
       const res = await fetch(`${config.BASE_URL}/api/restaurant/admin`, {
@@ -107,7 +109,7 @@ const CompletedOrders = () => {
   }, [token]);
 
   const updateOrder = async (orderId, updatedData) => {
-    // ... (your existing updateOrder code is fine) ...
+    // ... (your existing updateOrder function)
     try {
       const res = await fetch(`${API_URL}/${orderId}`, {
         method: "PUT",
@@ -128,7 +130,7 @@ const CompletedOrders = () => {
   };
 
   const deleteOrder = async (orderId) => {
-    // ... (your existing deleteOrder code is fine) ...
+    // ... (your existing deleteOrder function)
     try {
       const res = await fetch(`${API_URL}/${orderId}`, {
         method: "DELETE",
@@ -144,8 +146,8 @@ const CompletedOrders = () => {
     }
   };
 
-  // ✅ Initial Fetch (Updated dependencies)
   useEffect(() => {
+    // ... (your existing useEffect)
     if (!token) {
       showNotification("No token found. Please login first", "error");
       setLoading(false);
@@ -153,18 +155,50 @@ const CompletedOrders = () => {
     }
     fetchOrders();
     fetchMenuItems();
-    fetchRestaurantDetails(); // 👈 Call the new function
-  }, [token, fetchOrders, fetchMenuItems, fetchRestaurantDetails]); // 👈 Add dependencies
+    fetchRestaurantDetails();
+  }, [token, fetchOrders, fetchMenuItems, fetchRestaurantDetails]);
 
-  const completedOrders = orders.filter((o) => o.status === "completed");
+  // ✅ 2. Create the filtering logic
+  const filteredCompletedOrders = useMemo(() => {
+    // Get reference dates
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    const startOfWeek = new Date(today);
+    // Adjust to Monday as start of week if needed, here it's Sunday
+    startOfWeek.setDate(today.getDate() - today.getDay());
+
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    return orders
+      .filter((o) => o.status === "completed") // Filter by status first
+      .filter((o) => { // Finally, filter by date
+        const orderDate = new Date(o.createdAt);
+        switch (dateFilter) {
+          case "today":
+            return orderDate >= today;
+          case "yesterday":
+            return orderDate >= yesterday && orderDate < today;
+          case "week":
+            return orderDate >= startOfWeek;
+          case "month":
+            return orderDate >= startOfMonth;
+          case "all":
+          default:
+            return true;
+        }
+      });
+  }, [orders, dateFilter]); // Re-filter when data or filters change
 
   return (
-    <div className="min-h-screen  px-4 py-6 sm:px-6 lg:px-8 relative">
-      {/* ... (Notification Modal remains the same) ... */}
+    <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8 relative">
       <AnimatePresence>
         {notification.show && (
+          // ... (your existing notification JSX)
           <motion.div
-            // ... (notification JSX) ...
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -175,7 +209,6 @@ const CompletedOrders = () => {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
-              // ... (rest of the modal JSX) ...
               transition={{
                 type: "spring",
                 damping: 25,
@@ -189,7 +222,6 @@ const CompletedOrders = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="text-center">
-                {/* ... (icon, text, button) ... */}
                 <div
                   className={`w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-6 ${notification.type === "success"
                     ? "bg-green-100 text-green-600 border-2 border-green-200"
@@ -260,27 +292,43 @@ const CompletedOrders = () => {
       </AnimatePresence>
 
       <div>
-        <div className="mb-4">
+        {/* ✅ 3. Update the UI for filters */}
+        <div className="mb-4 flex flex-col sm:flex-row justify-between gap-4">
           <Heading title={"Completed Orders"} />
-        </div>        
+          <div className="flex flex-col sm:flex-row items-stretch gap-2">
+            {/* Date Filter */}
+            <select
+              id="dateFilter"
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="px-2 py-2 sm:px-3 border rounded-lg text-xs sm:text-sm font-medium bg-white hover:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-500 min-w-20 sm:min-w-32"
+            >
+              <option value="today">Today</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="all">All Time</option>
+            </select>
+          </div>
+        </div>
         <OrdersTable
-          orders={completedOrders}
+          // ✅ 4. Pass the new filtered list
+          orders={filteredCompletedOrders}
           loading={loading}
           error={error}
           setEditingOrder={setEditingOrder}
           setShowConfirmDelete={setShowConfirmDelete}
-          // ✅ 3. FIX: Pass the correct prop name
           setOrderForBillModal={setSelectedItems}
           updateOrder={updateOrder}
           tableType={tableType}
         />
       </div>
 
-      {/* ✅ 4. Pass restaurantDetails to the modal */}
+      {/* ... (Your Modals: ItemsModal, EditOrderModal, DeleteModal) ... */}
       {selectedItems && (
         <ItemsModal
           order={selectedItems}
-          restaurantDetails={restaurantDetails} // 👈 Pass details
+          restaurantDetails={restaurantDetails}
           onClose={() => setSelectedItems(null)}
         />
       )}
