@@ -3,6 +3,7 @@ import React, { useRef } from "react";
 import { motion } from "framer-motion"; // Optional: for modal animation
 
 const BillPage = ({ order, restaurantDetails, onClose }) => {
+  console.log(order)
   const billRef = useRef();
 
   const handlePrint = () => {
